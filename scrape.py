@@ -4,6 +4,7 @@ import random
 import time
 from bs4 import BeautifulSoup
 
+
 headers = {"User-Agent": "Mozilla/5.0"}
 
 def scrape(url, writer):
@@ -53,11 +54,11 @@ def scrape(url, writer):
 
 with open('allshows.csv', 'a', newline='', encoding='utf-8') as f:
     writer = csv.writer(f)
-    writer.writerow(['Concert', 'Song', 'Last Played'])
+    writer.writerow(['Date', 'Song', 'Last Played'])
     with open('show_urls.csv', newline='', encoding='utf-8') as url_file:
         reader = csv.reader(url_file)
         for row in reader:
             url = "https://dmbalmanac.com" + row[0]
             print("Scraping:", url)
             scrape(url, writer)
-            time.sleep(random.uniform(2,4))
+            time.sleep(random.uniform(5,8))
