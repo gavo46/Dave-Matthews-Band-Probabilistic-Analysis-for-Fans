@@ -19,7 +19,7 @@ def get_global_mean_play_rate(data):
     num_shows = data["Date"].nunique()
     return total_plays / (num_songs * num_shows)
 
-def get_prob(data, song, last_known):
+def get_prob(data, song, global_mean_rate):
     all_shows_sorted = sorted(data["Date"].unique())
     target_date = date.today()
     total_shows = data["Date"].nunique()
@@ -28,7 +28,9 @@ def get_prob(data, song, last_known):
     first_index = filtered.index[0]
     first_date = filtered["Date"].min()
     last_played_date = filtered["Date"].max()
-    if (target_date - last_played_date).days / 365.25 >= 10: # Bucket 3: Irrelevant
+    shows_elapsed = len([d for d in all_shows_sorted if last_played_date < d <= target_date])
+    years_elapsed = (target_date - last_played_date).days / 365.25
+    if years_elapsed >= 10 or shows_elapsed == 0: # Bucket 3: Irrelevant
         return 0 
     elif total_shows - sorted(data["Date"].unique()).index(first_date) <= 25 and count < 5: # bucket 4
         return bucket_4(global_mean_rate, 2.5, min(25, data[data["Date"] > first_date]["Date"].nunique()), count) 
@@ -42,15 +44,16 @@ def get_prob(data, song, last_known):
         # EWMA
         gap_series = pd.Series(gaps)
         G_expected = gap_series.ewm(alpha=0.3, adjust=False).mean().iloc[-1]
-        shows_elapsed = len([d for d in all_shows_sorted if last_played_date < d <= target_date])
         hazard = shows_elapsed / G_expected
-        return sigmoid(-1 * (hazard - 1))
+        return sigmoid(2 * (hazard - 1.6))
 
 
     
 def main():
     data = pd.read_csv("allshows.csv")
-    songs = data['Song'].unique()
+    data["Date"] = pd.to_datetime(data["Date"], format="%m.%d.%Y").dt.date
+    data["Song"] = data["Song"].str.lower()  
+    songs = data['Song'].unique()  
     global_mean_rate = get_global_mean_play_rate(data)
 
     while True:

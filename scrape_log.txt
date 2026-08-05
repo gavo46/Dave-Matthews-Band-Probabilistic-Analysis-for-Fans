@@ -1,0 +1,10 @@
+Scraping: https://dmbalmanac.com/TourShowSet.aspx?id=453056860&tid=65&where=1991
+[1, 2, 3, 4, 5, 6, 7]
+Traceback (most recent call last):
+  File "/Users/gavinoh/Desktop/Projects/Code/WhatWouldTheyPlay/scrape.py", line 76, in <module>
+    scrape(url, writer)
+    ~~~~~~^^^^^^^^^^^^^
+  File "/Users/gavinoh/Desktop/Projects/Code/WhatWouldTheyPlay/scrape.py", line 62, in scrape
+    writer.writerow([date, title.replace("»", "").replace(",", "").strip(), gaps[gaps_count].replace(", TD", "").strip()])
+                                                                                 ^^^^^^^^^^
+NameError: name 'gaps_count' is not defined
