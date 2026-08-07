@@ -44,9 +44,10 @@ def get_prob(data, song, global_mean_rate):
         # EWMA
         gap_series = pd.Series(gaps)
         G_expected = gap_series.ewm(alpha=0.3, adjust=False).mean().iloc[-1]
-        years_dormant_factor = max(0, 1 - (years_elapsed / 10))  # shrinks toward 0 as years_elapsed approaches 10
-        hazard = min(shows_elapsed / G_expected, 3) * years_dormant_factor
-        return sigmoid(2 * (hazard - 1.6))
+        decay = math.exp(-years_elapsed / 1.5)
+        hazard = min(shows_elapsed / G_expected, 3)
+        base_prob = sigmoid(2 * (hazard - 1.6))
+        return base_prob * decay
 
 
     
